@@ -28,7 +28,6 @@
 #include "esphome/core/log.h"
 
 #include "lc709203f.h"
-#include "Wire.h"
 
 namespace esphome {
 namespace lc709203f {
