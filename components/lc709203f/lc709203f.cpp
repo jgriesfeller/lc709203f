@@ -357,11 +357,11 @@ int16_t LC709203FComponent::read16( uint8_t regAddress)
   uint8_t lowByteData;
   uint8_t highByteData;
   // Wire.beginTransmission(i2c_address);
-  this->write(regAddress,1);
+  this->write(&regAddress,1);
   // Wire.endTransmission(false);
   // Wire.requestFrom(i2c_address, (uint8_t)  2);   // jbo added per WEMOS_SHT3x_Arduino_Library issue 7
-  this->read(lowByteData,1);
-  this->read(highByteData,1);
+  this->read(&lowByteData,1);
+  this->read(&highByteData,1);
   data = word(highByteData, lowByteData);
   return( data );
 }
