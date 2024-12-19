@@ -27,8 +27,8 @@
 
 #include "esphome/core/log.h"
 
+
 #include "lc709203f.h"
-#include "Wire.h"
 
 namespace esphome {
 namespace lc709203f {
@@ -50,7 +50,7 @@ bool LC709203FComponent::begin( void )
 {
 
   ESP_LOGCONFIG( TAG, "Starting up LC709203F sensor");
-  Wire.begin();
+  // Wire.begin();
   setPowerMode(LC709203F_POWER_OPERATE) ;
   setTemperatureMode(LC709203F_TEMPERATURE_THERMISTOR) ;
 
@@ -69,7 +69,7 @@ bool LC709203FComponent::begin( void )
 void LC709203FComponent::setup() {
 
   ESP_LOGCONFIG( TAG, "Setting Up  LC709203F sensor");
-  Wire.begin();
+  // Wire.begin();
   setPowerMode(LC709203F_POWER_OPERATE) ;
   setTemperatureMode(LC709203F_TEMPERATURE_THERMISTOR) ;
   setCellCapacity(LC709203F_APA_2000MAH) ;    // jbo to suit the batery I am testing with
@@ -336,28 +336,32 @@ void LC709203FComponent::write16(uint8_t regAddress, uint16_t data)
   crcArray[3] = highByte(data);
   // Calculate crc of preceding four bytes and place in crcArray[4]
   crcArray[4] = crc8( crcArray, 4 );
-  // Device address
-  Wire.beginTransmission(i2c_address);
-  // Register address
-  Wire.write(regAddress);
-  // low byte
-  Wire.write(crcArray[2]);
-  // high byte
-  Wire.write(crcArray[3]);
-  // Send crc8 
-  Wire.write(crcArray[4]);
-  Wire.endTransmission();
+  // // Device address
+  // Wire.beginTransmission(i2c_address);
+  // // Register address
+  // Wire.write(regAddress);
+  this->write(&regAddress,1);
+  // // low byte
+  this->write(&crcArray[2],1);
+  // // high byte
+  this->write(&crcArray[3], 1);
+  // // Send crc8 
+  this->write(&crcArray[4],1);
+  // Wire.endTransmission();
+  
 }
 
 int16_t LC709203FComponent::read16( uint8_t regAddress)
 {
   int16_t data = 0;
-  Wire.beginTransmission(i2c_address);
-  Wire.write(regAddress);
-  Wire.endTransmission(false);
-  Wire.requestFrom(i2c_address, (uint8_t)  2);   // jbo added per WEMOS_SHT3x_Arduino_Library issue 7
-  uint8_t lowByteData = Wire.read();
-  uint8_t highByteData = Wire.read();
+  uint8_t lowByteData;
+  uint8_t highByteData;
+  // Wire.beginTransmission(i2c_address);
+  this->write(regAddress,1);
+  // Wire.endTransmission(false);
+  // Wire.requestFrom(i2c_address, (uint8_t)  2);   // jbo added per WEMOS_SHT3x_Arduino_Library issue 7
+  this->read(lowByteData,1);
+  this->read(highByteData,1);
   data = word(highByteData, lowByteData);
   return( data );
 }
